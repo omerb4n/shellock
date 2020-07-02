@@ -1,2 +1,3 @@
 .vscode/
-executables/
+bin/
+obj/
