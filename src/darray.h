@@ -5,7 +5,7 @@ Exports functions to deal with dynamic size arrays in heap
 
 typedef struct {
     unsigned int size;
-    unsigned int *data;
+    unsigned char *data;
 } DArray;
 
 void darray_init(DArray *darray, unsigned int initial_size);

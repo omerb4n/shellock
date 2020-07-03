@@ -1,5 +1,5 @@
 /*
-Stands for dynamic size array.
+Stands for dynamic size char array.
 Exports functions to deal with dynamic sized char arrays in heap.
 */
 
@@ -9,11 +9,11 @@ Exports functions to deal with dynamic sized char arrays in heap.
 
 void darray_init(DArray *darray, unsigned int initial_size){
     darray->size = initial_size;
-    darray->data = malloc(sizeof(int) * darray->size);
+    darray->data = malloc(sizeof(char) * darray->size);
 }
 
 void darray_set(DArray *darray, unsigned int index, char value) {
-    if (index + sizeof(value) > darray->size) {
+    if (index + sizeof(char) > darray->size) {
         darray_expand(darray, darray->size);
     }
     darray->data[index] = value;
@@ -30,7 +30,9 @@ char darray_get(DArray *darray, unsigned int index){
 
 void darray_free(DArray *darray) {
     free(darray->data);
+    darray->size = 0;
 }
 void darray_expand(DArray *darray, unsigned int n) {
-    darray->data = realloc(darray->data, sizeof(char) * n);
+    darray->size = darray->size + sizeof(char) * n;
+    darray->data = realloc(darray->data, darray->size);
 }
