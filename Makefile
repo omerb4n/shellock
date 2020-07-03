@@ -40,6 +40,7 @@ $(BIN_DIR) $(OBJ_DIR) $(TESTS_OBJ_DIR) $(TESTS_BIN_DIR):
 $(TESTS_BIN_DIR)/check_%: $(TESTS_OBJ_DIR)/check_%.o $(OBJ_DIR)/%.o | $(TESTS_BIN_DIR)
 	$(CC) $(LDFLAGS) $^ $(CHECK_LIBS) $(LDLIBS) -o $@
 
+test: CFLAGS += -g
 test: $(TESTS_BIN)
 
 clean:
