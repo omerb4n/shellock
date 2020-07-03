@@ -15,6 +15,7 @@ TESTS_SRC := $(wildcard $(TESTS_SRC_DIR)/*.c)
 TESTS_OBJ := $(TESTS_SRC:$(TESTS_SRC_DIR)/%.c=$(TESTS_OBJ_DIR)/%.o)
 TESTS_BIN := $(TESTS_OBJ:$(TESTS_OBJ_DIR)/%.o=$(TESTS_BIN_DIR)/%)
 
+DFLAGS   := -g
 CPPFLAGS :=
 CFLAGS   := -Wall -Iinclude -MMD -MP
 LDFLAGS  := -Llib
@@ -40,7 +41,10 @@ $(BIN_DIR) $(OBJ_DIR) $(TESTS_OBJ_DIR) $(TESTS_BIN_DIR):
 $(TESTS_BIN_DIR)/check_%: $(TESTS_OBJ_DIR)/check_%.o $(OBJ_DIR)/%.o | $(TESTS_BIN_DIR)
 	$(CC) $(LDFLAGS) $^ $(CHECK_LIBS) $(LDLIBS) -o $@
 
-test: CFLAGS += -g
+debug: CFLAGS += $(DFLAGS)
+debug: $(EXE)
+
+test: CFLAGS += $(DFLAGS)
 test: $(TESTS_BIN)
 
 clean:
