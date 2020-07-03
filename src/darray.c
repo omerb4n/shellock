@@ -13,8 +13,14 @@ void darray_init(DArray *darray, unsigned int initial_size){
 }
 
 void darray_set(DArray *darray, unsigned int index, char value) {
-    if (index + sizeof(char) > darray->size) {
-        darray_expand(darray, darray->size);
+    unsigned int assummed_size = index + sizeof(char);
+    if (assummed_size > darray->size) {
+        unsigned int expand_size;
+        if (assummed_size > darray->size * 2)
+            expand_size = assummed_size - darray->size;
+        else
+            expand_size = darray->size;
+        darray_expand(darray, expand_size);
     }
     darray->data[index] = value;
 }
