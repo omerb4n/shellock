@@ -16,10 +16,24 @@ START_TEST(test_darray_set) {
 
   darray_init(&darray, 1);
   ck_assert_int_eq(darray.size, 1);
-  darray_set(&darray, 0, 1);
+  darray_set(&darray, 0, 0);
   ck_assert_int_eq(darray.size, 1);
-  darray_set(&darray, 2, 1);
+  ck_assert_int_eq(darray.data[0], 0);
+
+  /* Check expanding when needed */
+  darray_set(&darray, 1, 1);
   ck_assert_int_eq(darray.size, 2);
+  ck_assert_int_eq(darray.data[1], 1);
+
+  /* Check expanding by size*2 */
+  darray_set(&darray, 2, 2);
+  ck_assert_int_eq(darray.size, 4);
+  ck_assert_int_eq(darray.data[2], 2);
+
+  /* Check expanding by requested index */
+  darray_set(&darray, 10, 10);
+  ck_assert_int_eq(darray.size, 10 + 1);
+  ck_assert_int_eq(darray.data[10], 10);
   darray_free(&darray);
 } END_TEST
 
