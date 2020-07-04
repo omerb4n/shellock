@@ -6,10 +6,14 @@ Exports functions to deal with dynamic sized char arrays in heap.
 #include "darray.h"
 #include <stdlib.h>
 #include <stdio.h>
+#include "errors.h"
 
 void darray_init(DArray *darray, unsigned int initial_size){
     darray->size = initial_size;
     darray->data = malloc(sizeof(char) * darray->size);
+    if (darray->data == 0) {
+        shellock_error(ERROR_MEMORY);
+    }
 }
 
 void darray_set(DArray *darray, unsigned int index, char value) {
@@ -41,4 +45,7 @@ void darray_free(DArray *darray) {
 void darray_expand(DArray *darray, unsigned int n) {
     darray->size = darray->size + sizeof(char) * n;
     darray->data = realloc(darray->data, darray->size);
+    if (darray->data == 0) {
+        shellock_error(ERROR_MEMORY);
+    }
 }
