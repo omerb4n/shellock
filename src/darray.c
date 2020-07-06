@@ -10,7 +10,7 @@ Exports functions to deal with dynamic sized char arrays in heap.
 
 void darray_init(DArray *darray, unsigned int initial_size){
     darray->size = initial_size;
-    darray->index = 0;
+    darray->length = 0;
     darray->data = malloc(sizeof(char) * darray->size);
     if (darray->data == 0) {
         shellock_error(ERROR_MEMORY);
@@ -18,7 +18,7 @@ void darray_init(DArray *darray, unsigned int initial_size){
 }
 
 void darray_append(DArray * darray, char value) {
-    darray_set(darray, darray->index, value);
+    darray_set(darray, darray->length, value);
 }
 
 void darray_set(DArray *darray, unsigned int index, char value) {
@@ -32,8 +32,8 @@ void darray_set(DArray *darray, unsigned int index, char value) {
         darray_expand(darray, expand_size);
     }
     darray->data[index] = value;
-    if (darray->index < index)
-        darray->index = index;
+    if (darray->length <= index)
+        darray->length = index +1;
 }
 
 char darray_get(DArray *darray, unsigned int index){
