@@ -1,6 +1,7 @@
 typedef enum ShellockError {
     ERROR_OK = 0,
     ERROR_MEMORY,
+    ERROR_VALUE,
     ERROR_COUNT
 } ShellockError;
 
