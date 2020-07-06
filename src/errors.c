@@ -1,9 +1,16 @@
 #include "errors.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <errno.h>
 #include <string.h>
 
-static const char* shellock_error_str(ShellockError err) {
+static const char* SHELLOCK_ERRORS_MESSAGES[] = 
+{
+    "OK",
+    "Memory allocation error"
+};
+
+static const char* const shellock_error_str(ShellockError err) {
     const char* err_str = UNKNOWN_ERROR_MESSAGE;
 
     // Ensure error codes are within the valid array index range
@@ -13,6 +20,7 @@ static const char* shellock_error_str(ShellockError err) {
     }
     return err_str;
 }
+
 void shellock_error(ShellockError err) {
     fprintf(stderr, "%d: %s", err, shellock_error_str(err));
     if (errno) { 
