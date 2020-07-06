@@ -21,6 +21,10 @@ void darray_append(DArray * darray, char value) {
     darray_set(darray, darray->length, value);
 }
 
+void darray_reset(DArray * darray) {
+    darray->length = 0;
+}
+
 void darray_set(DArray *darray, unsigned int index, char value) {
     unsigned int assummed_size = index + sizeof(char);
     if (assummed_size > darray->size) {
@@ -37,7 +41,7 @@ void darray_set(DArray *darray, unsigned int index, char value) {
 }
 
 char darray_get(DArray *darray, unsigned int index){
-    if(index > darray->size || index < 0){
+    if(index >= darray->length || index < 0){
         fprintf(stderr, "Index %d out of bounds for vector of size %d\n", index, darray->size);
         shellock_error(ERROR_VALUE);
     }
