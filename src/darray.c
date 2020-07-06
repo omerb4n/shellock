@@ -38,10 +38,9 @@ void darray_set(DArray *darray, unsigned int index, char value) {
 
 char darray_get(DArray *darray, unsigned int index){
     if(index > darray->size || index < 0){
-        printf("Index %d out of bounds for vector of size %d\n", index, darray->size);
-        exit(1);
+        fprintf(stderr, "Index %d out of bounds for vector of size %d\n", index, darray->size);
+        shellock_error(ERROR_VALUE);
     }
-
     return darray->data[index];
 }
 
