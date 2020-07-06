@@ -48,6 +48,7 @@ char darray_get(DArray *darray, unsigned int index){
 void darray_free(DArray *darray) {
     free(darray->data);
     darray->size = 0;
+    darray->length = 0;
 }
 void darray_expand(DArray *darray, unsigned int n) {
     darray->size = darray->size + sizeof(char) * n;
