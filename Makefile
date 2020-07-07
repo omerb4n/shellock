@@ -1,3 +1,4 @@
+MAIN_FILE_NAME := main
 SRC_DIR := src
 OBJ_DIR := obj
 BIN_DIR := bin
@@ -10,6 +11,7 @@ TESTS_BIN_DIR := $(TESTS_DIR)/bin
 EXE := $(BIN_DIR)/shellock
 SRC := $(wildcard $(SRC_DIR)/*.c)
 OBJ := $(SRC:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
+OBJ_NO_MAIN := $(filter-out $(OBJ_DIR)/$(MAIN_FILE_NAME).o, $(OBJ))
 
 TESTS_SRC := $(wildcard $(TESTS_SRC_DIR)/*.c)
 TESTS_OBJ := $(TESTS_SRC:$(TESTS_SRC_DIR)/%.c=$(TESTS_OBJ_DIR)/%.o)
@@ -38,7 +40,7 @@ $(TESTS_OBJ_DIR)/%.o: $(TESTS_SRC_DIR)/%.c | $(TESTS_OBJ_DIR)
 $(BIN_DIR) $(OBJ_DIR) $(TESTS_OBJ_DIR) $(TESTS_BIN_DIR):
 	mkdir -p $@
 
-$(TESTS_BIN_DIR)/check_%: $(TESTS_OBJ_DIR)/check_%.o $(OBJ_DIR)/%.o | $(TESTS_BIN_DIR)
+$(TESTS_BIN_DIR)/check_%: $(TESTS_OBJ_DIR)/check_%.o $(OBJ_NO_MAIN) | $(TESTS_BIN_DIR)
 	$(CC) $(LDFLAGS) $^ $(CHECK_LIBS) $(LDLIBS) -o $@
 
 debug: CFLAGS += $(DFLAGS)
