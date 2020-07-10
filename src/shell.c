@@ -10,7 +10,7 @@
 #define START_MESSAGE "Starting shell starting\n"
 
 
-void read_line(DArray * line, char const * prompt) {
+void read_line(DArray_t line, char const * prompt) {
     char current_char;
     print_prompt(prompt);
     darray_reset(line);
@@ -28,12 +28,11 @@ void print_prompt(char const * prompt) {
 }
 void shell_loop() {
     int result_status = 0;
-    DArray line;
-    darray_init(&line, LINE_BUFFER_INITIAL_SIZE);
+    DArray_t line = darray_new(LINE_BUFFER_INITIAL_SIZE);
     printf(START_MESSAGE);
     do {
-        read_line(&line, DEFAULT_PROMPT);
+        read_line(line, DEFAULT_PROMPT);
     }
     while(result_status == 0);
-    darray_free(&line);
+    darray_free(line);
 }
