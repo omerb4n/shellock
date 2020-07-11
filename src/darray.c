@@ -76,8 +76,9 @@ void darray_free(DArray_t darray) {
 }
 void darray_expand(DArray_t darray, size_t n) {
     darray->size = darray->size + sizeof(char) * n;
-    darray->data = realloc(darray->data, darray->size);
-    if (darray->data == 0) {
+    void * temporary_data_pointer = realloc(darray->data, darray->size);
+    if (temporary_data_pointer == 0) {
         shellock_error(ERROR_MEMORY);
     }
+    darray->data = temporary_data_pointer;
 }
