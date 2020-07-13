@@ -15,7 +15,6 @@
 void read_line(DArray_t line, char const * prompt) {
     char current_char;
     print_prompt(prompt);
-    darray_reset(line);
     while ((current_char = getc(stdin)) != END_OF_LINE) {
         darray_append(line, &current_char);
     }
@@ -50,6 +49,7 @@ void shell_loop() {
         read_line(line, DEFAULT_PROMPT);
         DArray_t words = split_line(darray_data(line));
         darray_free(words);
+        darray_reset(line);
     }
     while(result_status == 0);
     darray_free(line);
