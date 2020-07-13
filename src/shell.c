@@ -6,9 +6,11 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdbool.h>
+#include <errno.h>
 
 #define LINE_BUFFER_INITIAL_CAPACITY 100
 #define WORDS_BUFFER_INITIAL_CAPCITY 10
+#define PATH_BUFFER_INITIAL_CAPCITY 100
 #define EMPTY_INPUT ""
 #define DEFAULT_PROMPT "> "
 #define END_OF_LINE '\n'
@@ -17,7 +19,7 @@
 #define START_MESSAGE "Starting shell starting\n"
 
 const char * NULL_BYTE_PTR = NULL;
-
+DArray_t current_working_directory;
 void read_line(DArray_t line, char const * prompt) {
     char current_char;
     print_prompt(prompt);
@@ -28,10 +30,19 @@ void read_line(DArray_t line, char const * prompt) {
 }
 
 void print_prompt(char const * prompt) {
-    if (prompt != NULL) {
-        printf("%s", prompt);
-        fflush(stdout);
+    char * res;
+    while(!(res = getcwd(darray_data(current_working_directory), darray_size(current_working_directory)))) {
+        if (errno == ERANGE) {
+            darray_expand(current_working_directory, darray_size(current_working_directory));
+        } else {
+            shellock_error(UNKNOWN_ERROR);
+        }
     }
+    if (prompt != NULL) {
+        printf("%s", res);
+        printf("%s", prompt);
+    }
+    fflush(stdout);
 }
 
 bool execute_builtin_command(char ** command) {
@@ -78,11 +89,20 @@ void execute_command(char ** command) {
         waitpid(child_pid, &stat_loc, WUNTRACED);
     }
 }
+
+void initialize_gloabls(){
+    current_working_directory = darray_new(PATH_BUFFER_INITIAL_CAPCITY, sizeof(char));
+}
+
+void free_globals() {
+    darray_free(current_working_directory);
+}
+
 void shell_loop() {
     int result_status = 0;
     DArray_t line = darray_new(LINE_BUFFER_INITIAL_CAPACITY, sizeof(char));
     DArray_t words = darray_new(WORDS_BUFFER_INITIAL_CAPCITY, sizeof(char *));
-
+    initialize_gloabls();
     printf(START_MESSAGE);
     do {
         read_line(line, DEFAULT_PROMPT);
@@ -96,6 +116,7 @@ void shell_loop() {
     while(result_status == 0);
     darray_free(words);
     darray_free(line);
+    free_globals();
 }
 
 int cd(char *path) {
