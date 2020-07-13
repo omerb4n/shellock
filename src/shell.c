@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "shell.h"
 #include "errors.h"
+#include <string.h>
 
 #define LINE_BUFFER_INITIAL_SIZE 100 * sizeof(char)
 #define EMPTY_INPUT ""
@@ -27,12 +28,28 @@ void print_prompt(char const * prompt) {
         fflush(stdout);
     }
 }
+
+DArray_t split_line(char * line) {
+    DArray_t words = darray_new(10, sizeof(char *));
+    char *separator = " ";
+    char *parsed;
+
+    parsed = strtok(line, separator);
+    while (parsed != NULL) {
+        darray_append(words, parsed);
+        parsed = strtok(NULL, separator);
+    }
+    return words;
+}
+
 void shell_loop() {
     int result_status = 0;
     DArray_t line = darray_new(LINE_BUFFER_INITIAL_SIZE, sizeof(char));
     printf(START_MESSAGE);
     do {
         read_line(line, DEFAULT_PROMPT);
+        DArray_t words = split_line(darray_data(line));
+        darray_free(words);
     }
     while(result_status == 0);
     darray_free(line);
