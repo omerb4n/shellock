@@ -5,10 +5,12 @@
 #include <string.h>
 
 #define LINE_BUFFER_INITIAL_CAPACITY 100
+#define WORDS_BUFFER_INITIAL_CAPCITY 10
 #define EMPTY_INPUT ""
 #define DEFAULT_PROMPT "> "
 #define END_OF_LINE '\n'
 #define NULL_BYTE ""
+
 #define START_MESSAGE "Starting shell starting\n"
 
 
@@ -28,8 +30,7 @@ void print_prompt(char const * prompt) {
     }
 }
 
-DArray_t split_line(char * line) {
-    DArray_t words = darray_new(10, sizeof(char *));
+void split_line(DArray_t words, char * line) {
     char *separator = " ";
     char *parsed;
 
@@ -38,19 +39,22 @@ DArray_t split_line(char * line) {
         darray_append(words, parsed);
         parsed = strtok(NULL, separator);
     }
-    return words;
+    darray_append(words, &NULL_BYTE);
 }
 
 void shell_loop() {
     int result_status = 0;
     DArray_t line = darray_new(LINE_BUFFER_INITIAL_CAPACITY, sizeof(char));
+    DArray_t words = darray_new(WORDS_BUFFER_INITIAL_CAPCITY, sizeof(char *));
+
     printf(START_MESSAGE);
     do {
         read_line(line, DEFAULT_PROMPT);
-        DArray_t words = split_line(darray_data(line));
-        darray_free(words);
+        split_line(words, darray_data(line));
         darray_reset(line);
+        darray_reset(words);
     }
     while(result_status == 0);
+    darray_free(words);
     darray_free(line);
 }
