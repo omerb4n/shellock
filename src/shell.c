@@ -4,7 +4,7 @@
 #include "errors.h"
 #include <string.h>
 
-#define LINE_BUFFER_INITIAL_SIZE 100 * sizeof(char)
+#define LINE_BUFFER_INITIAL_CAPACITY 100
 #define EMPTY_INPUT ""
 #define DEFAULT_PROMPT "> "
 #define END_OF_LINE '\n'
@@ -43,7 +43,7 @@ DArray_t split_line(char * line) {
 
 void shell_loop() {
     int result_status = 0;
-    DArray_t line = darray_new(LINE_BUFFER_INITIAL_SIZE, sizeof(char));
+    DArray_t line = darray_new(LINE_BUFFER_INITIAL_CAPACITY, sizeof(char));
     printf(START_MESSAGE);
     do {
         read_line(line, DEFAULT_PROMPT);

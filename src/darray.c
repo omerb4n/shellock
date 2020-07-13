@@ -16,11 +16,11 @@ struct DArray_s {
     void *data;
 };
 
-DArray_t darray_new(unsigned int initial_size, size_t member_size)
+DArray_t darray_new(unsigned int initial_capacity, size_t member_size)
 {
     DArray_t darray = malloc(sizeof(struct DArray_s));
     darray->member_size = member_size;
-    darray->size = initial_size * darray->member_size;
+    darray->size = initial_capacity * darray->member_size;
     darray->length = 0;
     darray->data = malloc(darray->size);
     if (darray->data == 0) {
