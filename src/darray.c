@@ -75,8 +75,7 @@ void * darray_get(DArray_t darray, unsigned int index){
 
 void darray_free(DArray_t darray) {
     free(darray->data);
-    darray->size = 0;
-    darray->length = 0;
+    free(darray);
 }
 void darray_expand(DArray_t darray, size_t n) {
     darray->size = darray->size + darray->member_size * n;
