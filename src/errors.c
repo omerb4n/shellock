@@ -10,7 +10,8 @@ static const char* SHELLOCK_ERRORS_MESSAGES[] =
     "Memory allocation error",
     "Value error",
     "Fork error",
-    "Child Process error"
+    "Child Process error",
+    "Built in command errors"
 };
 
 static const char* const shellock_error_str(ShellockError err) {

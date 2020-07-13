@@ -4,6 +4,7 @@ typedef enum ShellockError {
     ERROR_VALUE,
     ERROR_FORK,
     ERROR_CHILD,
+    ERROR_BUILT_IN_COMMAND,
     ERROR_COUNT
 } ShellockError;
 

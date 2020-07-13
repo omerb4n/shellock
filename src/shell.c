@@ -5,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <stdbool.h>
 
 #define LINE_BUFFER_INITIAL_CAPACITY 100
 #define WORDS_BUFFER_INITIAL_CAPCITY 10
@@ -33,6 +34,17 @@ void print_prompt(char const * prompt) {
     }
 }
 
+bool execute_builtin_command(char ** command) {
+    if (strcmp(command[0], "cd") == 0) {
+        if (cd(command[1]) < 0) {
+            shellock_error(ERROR_BUILT_IN_COMMAND);
+        }
+    }
+    else
+        return false;
+    return true;
+}
+
 void split_line(DArray_t words, char * line) {
     char *separator = " ";
     char *parsed;
@@ -50,7 +62,9 @@ void execute_command(char ** command) {
 
     if (!command[0])   
         return;
-
+    if (execute_builtin_command(command))
+        return;
+        
     child_pid = fork();
     if (child_pid < 0) {
         shellock_error(ERROR_FORK);
@@ -82,4 +96,8 @@ void shell_loop() {
     while(result_status == 0);
     darray_free(words);
     darray_free(line);
+}
+
+int cd(char *path) {
+    return chdir(path);
 }
