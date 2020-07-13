@@ -3,6 +3,8 @@
 #include "shell.h"
 #include "errors.h"
 #include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
 
 #define LINE_BUFFER_INITIAL_CAPACITY 100
 #define WORDS_BUFFER_INITIAL_CAPCITY 10
@@ -13,6 +15,7 @@
 
 #define START_MESSAGE "Starting shell starting\n"
 
+const char * NULL_BYTE_PTR = NULL;
 
 void read_line(DArray_t line, char const * prompt) {
     char current_char;
@@ -33,15 +36,34 @@ void print_prompt(char const * prompt) {
 void split_line(DArray_t words, char * line) {
     char *separator = " ";
     char *parsed;
-
     parsed = strtok(line, separator);
     while (parsed != NULL) {
-        darray_append(words, parsed);
+        darray_append(words, &parsed);
         parsed = strtok(NULL, separator);
     }
-    darray_append(words, &NULL_BYTE);
+    darray_append(words, &NULL_BYTE_PTR);
 }
 
+void execute_command(char ** command) {
+    pid_t child_pid;
+    int stat_loc;
+
+    if (!command[0])   
+        return;
+
+    child_pid = fork();
+    if (child_pid < 0) {
+        shellock_error(ERROR_FORK);
+    }
+    if (child_pid == 0) {
+        if (execvp(command[0], command) < 0) {
+            perror(command[0]);
+            shellock_error(ERROR_CHILD);
+        }
+    } else {
+        waitpid(child_pid, &stat_loc, WUNTRACED);
+    }
+}
 void shell_loop() {
     int result_status = 0;
     DArray_t line = darray_new(LINE_BUFFER_INITIAL_CAPACITY, sizeof(char));
@@ -51,6 +73,9 @@ void shell_loop() {
     do {
         read_line(line, DEFAULT_PROMPT);
         split_line(words, darray_data(line));
+
+        execute_command(darray_data(words));
+
         darray_reset(line);
         darray_reset(words);
     }
