@@ -7,6 +7,7 @@
 #include <sys/wait.h>
 #include <stdbool.h>
 #include <errno.h>
+#include "darray.h"
 
 #define LINE_BUFFER_INITIAL_CAPACITY 100
 #define WORDS_BUFFER_INITIAL_CAPCITY 10
@@ -18,9 +19,18 @@
 
 #define START_MESSAGE "Starting shell starting\n"
 
+static void read_line(DArray_t line, char const * prompt);
+static void print_prompt(char const * prompt);
+static bool execute_builtin_command(char ** command);
+static void split_line(DArray_t words, char * line);
+static void execute_command(char ** command);
+static void initialize_gloabls();
+static void free_globals();
+static int cd(char *path);
+
 const char * NULL_BYTE_PTR = NULL;
 DArray_t current_working_directory;
-void read_line(DArray_t line, char const * prompt) {
+static void read_line(DArray_t line, char const * prompt) {
     char current_char;
     print_prompt(prompt);
     while ((current_char = getc(stdin)) != END_OF_LINE) {
@@ -29,7 +39,7 @@ void read_line(DArray_t line, char const * prompt) {
     darray_append(line, &NULL_BYTE);
 }
 
-void print_prompt(char const * prompt) {
+static void print_prompt(char const * prompt) {
     char * res;
     while(!(res = getcwd(darray_data(current_working_directory), darray_size(current_working_directory)))) {
         if (errno == ERANGE) {
@@ -45,7 +55,7 @@ void print_prompt(char const * prompt) {
     fflush(stdout);
 }
 
-bool execute_builtin_command(char ** command) {
+static bool execute_builtin_command(char ** command) {
     if (strcmp(command[0], "cd") == 0) {
         if (cd(command[1]) < 0) {
             shellock_error(ERROR_BUILT_IN_COMMAND);
@@ -56,7 +66,7 @@ bool execute_builtin_command(char ** command) {
     return true;
 }
 
-void split_line(DArray_t words, char * line) {
+static void split_line(DArray_t words, char * line) {
     char *separator = " ";
     char *parsed;
     parsed = strtok(line, separator);
@@ -67,7 +77,7 @@ void split_line(DArray_t words, char * line) {
     darray_append(words, &NULL_BYTE_PTR);
 }
 
-void execute_command(char ** command) {
+static void execute_command(char ** command) {
     pid_t child_pid;
     int stat_loc;
 
@@ -90,11 +100,11 @@ void execute_command(char ** command) {
     }
 }
 
-void initialize_gloabls(){
+static void initialize_gloabls(){
     current_working_directory = darray_new(PATH_BUFFER_INITIAL_CAPCITY, sizeof(char));
 }
 
-void free_globals() {
+static void free_globals() {
     darray_free(current_working_directory);
 }
 
@@ -119,6 +129,6 @@ void shell_loop() {
     free_globals();
 }
 
-int cd(char *path) {
+static int cd(char *path) {
     return chdir(path);
 }
