@@ -73,7 +73,7 @@ static void print_prompt(char const * prompt) {
 static bool execute_builtin_command(char ** command) {
     if (strcmp(command[0], "cd") == 0) {
         if (cd(command[1]) < 0) {
-            shellock_error(ERROR_BUILT_IN_COMMAND);
+            fprintf(stderr, "%d: %s\n", errno, strerror(errno));
         }
     }
     else
