@@ -2,6 +2,10 @@
 Stands for dynamic array.
 Exports functions to deal with dynamic size arrays in heap
 */
+#ifndef _DARRAY
+#define _DARRAY
+
+#include <signal.h>
 #include <stddef.h>
 
 typedef struct DArray_s *DArray_t;
@@ -16,3 +20,5 @@ void darray_free(DArray_t darray);
 size_t darray_size(DArray_t darray);
 void * darray_data(DArray_t darray);
 size_t darray_length(DArray_t darray);
+
+#endif
