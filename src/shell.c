@@ -8,6 +8,8 @@
 #include <stdbool.h>
 #include <errno.h>
 #include "darray.h"
+#include <setjmp.h>
+#include "signalock.h"
 
 #define LINE_BUFFER_INITIAL_CAPACITY 100
 #define WORDS_BUFFER_INITIAL_CAPCITY 10
@@ -16,6 +18,7 @@
 #define DEFAULT_PROMPT "> "
 #define END_OF_LINE '\n'
 #define NULL_BYTE ""
+#define SIGINT_JUMP 62 // arbitrary value
 
 #define START_MESSAGE "Starting shell starting\n"
 
@@ -27,10 +30,22 @@ static void execute_command(char ** command);
 static void initialize_gloabls();
 static void free_globals();
 static int cd(char *path);
+static void sigint_handler(int);
 
 const char * NULL_BYTE_PTR = NULL;
+static sigjmp_buf shell_loop_environment;
+static volatile sig_atomic_t jump_active = 0;
 DArray_t current_working_directory;
+
+static void sigint_handler(int signo) {
+    if (!jump_active) {
+        return;
+    }
+    siglongjmp(shell_loop_environment, SIGINT_JUMP);
+}
+
 static void read_line(DArray_t line, char const * prompt) {
+    darray_reset(line);
     char current_char;
     print_prompt(prompt);
     while ((current_char = getc(stdin)) != END_OF_LINE) {
@@ -69,6 +84,7 @@ static bool execute_builtin_command(char ** command) {
 static void split_line(DArray_t words, char * line) {
     char *separator = " ";
     char *parsed;
+    darray_reset(words);
     parsed = strtok(line, separator);
     while (parsed != NULL) {
         darray_append(words, &parsed);
@@ -91,6 +107,7 @@ static void execute_command(char ** command) {
         shellock_error(ERROR_FORK);
     }
     if (child_pid == 0) {
+        set_sigaction(SIGINT, SIG_DFL);
         if (execvp(command[0], command) < 0) {
             perror(command[0]);
             shellock_error(ERROR_CHILD);
@@ -113,17 +130,20 @@ void shell_loop() {
     DArray_t line = darray_new(LINE_BUFFER_INITIAL_CAPACITY, sizeof(char));
     DArray_t words = darray_new(WORDS_BUFFER_INITIAL_CAPCITY, sizeof(char *));
     initialize_gloabls();
+    set_sigaction(SIGINT, sigint_handler);
     printf(START_MESSAGE);
     do {
+        if (sigsetjmp(shell_loop_environment, 1) == SIGINT_JUMP)
+            printf("\n");
+        jump_active = 1;
+
         read_line(line, DEFAULT_PROMPT);
         split_line(words, darray_data(line));
 
         execute_command(darray_data(words));
-
-        darray_reset(line);
-        darray_reset(words);
     }
     while(result_status == 0);
+    set_sigaction(SIGINT, SIG_DFL);
     darray_free(words);
     darray_free(line);
     free_globals();
