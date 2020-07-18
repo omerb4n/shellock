@@ -76,6 +76,10 @@ static bool execute_builtin_command(char ** command) {
             fprintf(stderr, "%d: %s\n", errno, strerror(errno));
         }
     }
+    else if (strcmp(command[0], "exit") == 0) {
+        printf("Exiting shell\n");
+        exit(0);
+    }
     else
         return false;
     return true;
