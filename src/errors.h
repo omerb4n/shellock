@@ -1,6 +1,5 @@
 typedef enum ShellockError {
-    ERROR_OK = 0,
-    UNKNOWN_ERROR,
+    UNKNOWN_ERROR = 0,
     ERROR_MEMORY,
     ERROR_VALUE,
     ERROR_FORK,

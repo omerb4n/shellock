@@ -6,7 +6,6 @@
 
 static const char* SHELLOCK_ERRORS_MESSAGES[] = 
 {
-    "OK",
     "Unknown error",
     "Memory allocation error",
     "Value error",
