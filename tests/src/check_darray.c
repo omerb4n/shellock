@@ -4,34 +4,37 @@
 
 
 START_TEST(test_darray_new) {
-  DArray_t darray = darray_new(0);
+  DArray_t darray = darray_new(0, 1);
 
   ck_assert_int_eq(darray_size(darray), 0);
   darray_free(darray);
 } END_TEST
 
 START_TEST(test_darray_set) {
-  DArray_t darray = darray_new(1);
-
+  DArray_t darray = darray_new(1, 1);
+  char some_value = 0;
+  char some_value_2 = 1;
+  char some_value_3 = 2;
+  char some_value_10 = 10;
   ck_assert_int_eq(darray_size(darray), 1);
-  darray_set(darray, 0, 0);
+  darray_set(darray, 0, &some_value);
   ck_assert_int_eq(darray_size(darray), 1);
-  ck_assert_int_eq(darray_data(darray)[0], 0);
+  ck_assert_int_eq(((char *)darray_data(darray))[0], some_value);
 
   /* Check expanding when needed */
-  darray_set(darray, 1, 1);
+  darray_set(darray, 1, &some_value_2);
   ck_assert_int_eq(darray_size(darray), 2);
-  ck_assert_int_eq(darray_data(darray)[1], 1);
+  ck_assert_int_eq(((char *)darray_data(darray))[1], some_value_2);
 
   /* Check expanding by size*2 */
-  darray_set(darray, 2, 2);
+  darray_set(darray, 2, &some_value_3);
   ck_assert_int_eq(darray_size(darray), 4);
-  ck_assert_int_eq(darray_data(darray)[2], 2);
+  ck_assert_int_eq(((char *)darray_data(darray))[2], some_value_3);
 
   /* Check expanding by requested index */
-  darray_set(darray, 10, 10);
+  darray_set(darray, 10, &some_value_10);
   ck_assert_int_eq(darray_size(darray), 10 + 1);
-  ck_assert_int_eq(darray_data(darray)[10], 10);
+  ck_assert_int_eq(((char *)darray_data(darray))[10], some_value_10);
   darray_free(darray);
 } END_TEST
 
